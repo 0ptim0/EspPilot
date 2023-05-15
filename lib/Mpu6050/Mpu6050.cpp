@@ -1,15 +1,28 @@
-#include "mpu6050.hpp"
+#include "Mpu6050.hpp"
 
 #include <driver/i2c.h>
 #include <esp_log.h>
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "mpu6050_reg.hpp"
+#include "Mpu6050Reg.hpp"
 
 Mpu6050::Mpu6050()
     : i2c_num(I2C_NUM_1),
       period(10 / portTICK_PERIOD_MS),
+      address(ADDR[0]),
+      timeout(20 / portTICK_PERIOD_MS) {
+    conf.mode = I2C_MODE_MASTER;
+    conf.sda_io_num = 21;
+    conf.scl_io_num = 22;
+    conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
+    conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
+    conf.master.clk_speed = 100000;
+}
+
+Mpu6050::Mpu6050(uint32_t period)
+    : i2c_num(I2C_NUM_1),
+      period(period / portTICK_PERIOD_MS),
       address(ADDR[0]),
       timeout(20 / portTICK_PERIOD_MS) {
     conf.mode = I2C_MODE_MASTER;

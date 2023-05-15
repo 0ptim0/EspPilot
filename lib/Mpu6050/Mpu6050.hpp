@@ -7,6 +7,7 @@
 class Mpu6050 {
 public:
     Mpu6050();
+    Mpu6050(uint32_t period);
     Mpu6050(uint32_t i2c_num, i2c_config_t &conf, uint32_t period);
     bool init();
     void start();
