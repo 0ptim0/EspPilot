@@ -1,3 +1,6 @@
+#ifndef WIFISTATION_HPP
+#define WIFISTATION_HPP
+
 #include <sys/param.h>
 
 #include "esp_event.h"
@@ -20,3 +23,5 @@ private:
     const char *ssid;
     const char *password;
 };
+
+#endif  // WIFI_STATION_HPP

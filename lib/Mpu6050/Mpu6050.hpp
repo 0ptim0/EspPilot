@@ -12,9 +12,21 @@ public:
     bool init();
     void start();
     void update();
+    #pragma pack(push, 1)
+    struct Meas {
+        double ax;
+        double ay;
+        double az;
+        double wx;
+        double wy;
+        double wz;
+        double temp;
+    };
+    #pragma pack(pop)
 
 public:
     uint32_t getPeriod();
+    Meas getMeas();
     double getAx();
     double getAy();
     double getAz();
@@ -42,6 +54,7 @@ private:
     uint8_t address;
     uint32_t timeout;
     SemaphoreHandle_t mutex;
+    SemaphoreHandle_t sem;
 
 private:
     double accel_scale;

@@ -18,6 +18,7 @@ Mpu6050::Mpu6050()
     conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
     conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
     conf.master.clk_speed = 100000;
+    conf.clk_flags = I2C_SCLK_SRC_FLAG_FOR_NOMAL;
 }
 
 Mpu6050::Mpu6050(uint32_t period)
@@ -31,6 +32,7 @@ Mpu6050::Mpu6050(uint32_t period)
     conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
     conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
     conf.master.clk_speed = 100000;
+    conf.clk_flags = I2C_SCLK_SRC_FLAG_FOR_NOMAL;
 }
 
 Mpu6050::Mpu6050(uint32_t i2c_num, i2c_config_t &conf, uint32_t period)
@@ -58,6 +60,10 @@ bool Mpu6050::init() {
     if (mutex == nullptr) {
         return false;
     }
+    sem = xSemaphoreCreateBinary();
+    if (sem == nullptr) {
+        return false;
+    }
     accel_scale = (9.81 * 2) / (32768.0);
     accel_bias = 0.0;
     gyro_scale = (250.0) / (32768.0);
@@ -73,7 +79,7 @@ void Mpu6050::start() {
 }
 
 void Mpu6050::update() {
-    Meas meas = {};
+    RawMeas meas = {};
     readReg(ACCEL_XOUT_H, reinterpret_cast<uint8_t *>(&meas), 14);
     xSemaphoreTake(mutex, portMAX_DELAY);
     int16_t ax = meas.ACCEL_XOUT_H << 8 | meas.ACCEL_XOUT_L;
@@ -91,9 +97,25 @@ void Mpu6050::update() {
     m_wy = wy * gyro_scale + gyro_bias;
     m_wz = wz * gyro_scale + gyro_bias;
     xSemaphoreGive(mutex);
+    xSemaphoreGive(sem);
 }
 
 // Getters
+Mpu6050::Meas Mpu6050::getMeas() {
+    xSemaphoreTake(sem, portMAX_DELAY);
+    xSemaphoreTake(mutex, portMAX_DELAY);
+    Meas meas;
+    meas.ax = m_ax;
+    meas.ay = m_ay;
+    meas.az = m_az;
+    meas.temp = m_temp;
+    meas.wx = m_wx;
+    meas.wy = m_wy;
+    meas.wz = m_wz;
+    xSemaphoreGive(mutex);
+    return meas;
+}
+
 uint32_t Mpu6050::getPeriod() {
     return period;
 }

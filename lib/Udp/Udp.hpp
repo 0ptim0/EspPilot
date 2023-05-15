@@ -1,5 +1,9 @@
-#include "lwip/sockets.h"
+#ifndef UDP_HPP
+#define UDP_HPP
+
 #include <stdint.h>
+
+#include "lwip/sockets.h"
 
 class Udp {
 public:
@@ -26,3 +30,5 @@ private:
 public:
     static void udp_server_task(void *arg);
 };
+
+#endif  // UDP_HPP

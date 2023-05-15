@@ -5,7 +5,7 @@ extern "C" {
 #endif
 
 #pragma pack(push, 1)
-struct Meas {
+struct RawMeas {
     uint8_t ACCEL_XOUT_H;
     uint8_t ACCEL_XOUT_L;
     uint8_t ACCEL_YOUT_H;
